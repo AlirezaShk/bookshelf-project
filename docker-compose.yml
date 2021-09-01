@@ -2,7 +2,8 @@ version: "3.7"
 
 services:
   web:
-    image: my-laravel-image
+    image: yaraku/assignment:$COMPOSE_PROJECT_NAME
+    container_name: $COMPOSE_PROJECT_NAME-laravel
     ports:
       - 8000:8000
     volumes:

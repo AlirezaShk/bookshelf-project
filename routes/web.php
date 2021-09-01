@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/authors', 'App\Http\Controllers\AuthorController@index');
+Route::put('/authors', 'App\Http\Controllers\AuthorController@store');
+Route::get('/author/{author}', 'App\Http\Controllers\AuthorController@show');
+
