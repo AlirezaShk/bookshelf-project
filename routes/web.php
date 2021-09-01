@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
+Route::get('/books', 'App\Http\Controllers\BookController@index');
+Route::put('/books', 'App\Http\Controllers\BookController@store');
+Route::get('/book/{book}', 'App\Http\Controllers\BookController@show');
+
 Route::get('/authors', 'App\Http\Controllers\AuthorController@index');
 Route::put('/authors', 'App\Http\Controllers\AuthorController@store');
 Route::get('/author/{author}', 'App\Http\Controllers\AuthorController@show');
