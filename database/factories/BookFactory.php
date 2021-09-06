@@ -32,7 +32,7 @@ class BookFactory extends Factory
             'isbn' => Book::ISBNGenerator([10,13][$this->faker->numberBetween(0,1)]),
             'olang' => $this->faker->languageCode(),
             'langs' => json_encode([$this->faker->languageCode()]),
-            'descrip' => $this->faker->paragraph(),
+            'descrip' => $this->faker->optional(0.5, NULL)->paragraph(),
         ];
     }
 }

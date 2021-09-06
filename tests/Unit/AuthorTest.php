@@ -34,13 +34,16 @@ class AuthorTest extends TestCase
         $authorTable = $authorModel->getTable();
         $this->withoutExceptionHandling();
         // By Faker
+        $birth = $this->faker->date('Y-m-d', 'yesterday');
+        $death = $this->faker->optional(0.5, NULL)->dateTimeBetween($birth, 'now');
+        if (!is_null($death)) $death = $death->format('Y-m-d');
         $attributes = [
             'fname' => $this->faker->firstName(),
             'lname' => $this->faker->lastName(),
             'origin' => $this->faker->country(),
             'langs' => json_encode([$this->faker->languageCode()]),
-            'birth' => $this->faker->date('Y-m-d'),
-            'death' => $this->faker->optional(0.5, NULL)->date('Y-m-d', 'now'),
+            'birth' => $birth,
+            'death' => $death,
         ];
 
         $record = Author::create($attributes);

@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
 
         // It's currently Unnecessary to call the below function.
         
-        $this->call(AuthorSeeder::class);
+        // $this->call(AuthorSeeder::class);
     }
 }

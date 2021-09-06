@@ -22,7 +22,7 @@ class CreateBooksTable extends Migration
             $table->date('release_date');
             $table->string('olang');
             $table->string('langs');
-            $table->tinyText('descrip');
+            $table->tinyText('descrip')->nullable();
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('authors')
