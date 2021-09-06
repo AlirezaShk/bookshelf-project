@@ -8,7 +8,7 @@ use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Author;
 
-class BooksTest extends TestCase
+class CreateBooksTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
     /**
@@ -16,24 +16,8 @@ class BooksTest extends TestCase
      *
      * @return void
      */
-    public function test_list_view()
-    {
-        $this->withoutExceptionHandling();
-        $all = Book::factory(10)->create();
-        $response = $this->get('/books');
-        foreach($all as $record)
-            $response->assertSee($record->name);
-    }
 
-    public function test_single_view()
-    {
-        $this->withoutExceptionHandling();
-        $record = Book::factory()->create();
-        $response = $this->get('/book/' . $record->id)
-            ->assertSee($record->name);
-    }
-
-    public function test_create_new()
+    public function test_create_single()
     {
         $bookModel = new Book;
         $bookTable = $bookModel->getTable();
@@ -46,14 +30,25 @@ class BooksTest extends TestCase
             'isbn' => Book::ISBNGenerator([10,13][$this->faker->numberBetween(0,1)]),
             'olang' => $this->faker->languageCode(),
             'langs' => json_encode([$this->faker->languageCode()]),
-            'descrip' => $this->faker->paragraph(),
+            'descrip' => $this->faker->optional(0.5, NULL)->paragraph(),
         ];
 
-        //Assert that an error will occur due to FOREIGN KEY Constraint
+        //Assert that an error will occur due to incomplete data array
+        foreach($attributes as $k => $v) {
 
-        $this->put('/books', $attributes)
-            ->assertStatus(500);
+            //omit one
+            $attributes[$k] = NULL;
 
+            //test
+            $res = $this->put('/books', $attributes);
+            if ($k === 'descrip') $res->assertSessionDoesntHaveErrors($k)->assertSessionHasErrors('author_id');
+            else $res->assertSessionHasErrors($k);
+
+            //revert
+            $attributes[$k] = $v;
+        }
+
+        //Double checking to be sure
         $this->assertDatabaseMissing($bookTable, $attributes);
 
         //Assert that proper use will return ok
@@ -64,7 +59,7 @@ class BooksTest extends TestCase
 
         $this->assertNotEquals(500, $res->status());
 
-        $res->assertRedirect('/books');
+        $res->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas($bookTable, $attributes);
     }

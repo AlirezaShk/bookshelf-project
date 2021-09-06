@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use Illuminate\Http\Request;
+use App\Exceptions\UndefinedAuthorAttrException;
 
 class AuthorController extends Controller
 {
@@ -37,7 +38,14 @@ class AuthorController extends Controller
     public function store(Request $request)
     {
         //validate
-
+        $request->validate([
+            'fname' => 'required|string',
+            'lname' => 'required|string',
+            'origin' => 'required|string',
+            'langs' => 'required|string',
+            'birth' => 'required|date_format:Y-m-d|before_or_equal:now',
+            'death' => 'nullable|date_format:Y-m-d|before_or_equal:now|after:birth',
+        ]);
         //store
         Author::create($request->all());
         //redirect
@@ -75,7 +83,19 @@ class AuthorController extends Controller
      */
     public function update(Request $request, Author $author)
     {
-        //
+        foreach($request->input('fields') as $k => $v) {
+
+        //validate
+            if(!isset($author->$k) AND 
+                !($k == 'death' AND $author->$k == NULL)) 
+                throw new UndefinedAuthorAttrException;
+
+        //edit
+            else 
+                $author->$k = $v;
+        }
+        $author->update();
+        return redirect('/author/'.$author->id);
     }
 
     /**
@@ -86,6 +106,6 @@ class AuthorController extends Controller
      */
     public function destroy(Author $author)
     {
-        //
+        $author->delete();
     }
 }

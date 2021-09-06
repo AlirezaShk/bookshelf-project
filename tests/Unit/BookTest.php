@@ -66,4 +66,11 @@ class BookTest extends TestCase
         $this->assertTrue(FALSE);
     }
 
+    public function test_belongs_to_an_author()
+    {
+        $book = Book::factory()->create();
+
+        $this->assertInstanceOf(Author::class, $book->author);
+    }
+
 }

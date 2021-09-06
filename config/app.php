@@ -231,4 +231,11 @@ return [
 
     ],
 
+    'allowed_export_filetypes' => [
+        'CSV',
+        'XML',
+        'YAML',
+        'JSON'
+    ],
+
 ];

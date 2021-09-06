@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\Author;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Database\Eloquent\Collection;
 
 class AuthorTest extends TestCase
 {
@@ -47,4 +48,10 @@ class AuthorTest extends TestCase
         $this->assertDatabaseHas($authorTable, $attributes);
     }
 
+    public function test_has_books()
+    {
+        $author = Author::factory()->create();
+
+        $this->assertInstanceOf(Collection::class, $author->books);
+    }
 }
