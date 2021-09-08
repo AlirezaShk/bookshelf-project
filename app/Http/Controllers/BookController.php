@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Author;
 use Illuminate\Http\Request;
 use SoapBox\Formatter\Formatter;
 use App\Exceptions\UndefinedBookAttrException;
@@ -141,7 +140,7 @@ class BookController extends Controller
         $i = 0;
         foreach($books as $book) {
             $data[$i] = $book->getAttributes();
-            $data[$i]['author'] = Author::findOrFail(['id'=>$book['author_id']])->first()->getAttributes();
+            $data[$i]['author'] = $book->author;
             unset($data[$i++]['author_id']);
         }
         $formatter = Formatter::make($data, Formatter::ARR);
