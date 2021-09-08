@@ -1,0 +1,97 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+
+#site-title {
+	@for $i from 1 through 20 {
+		span:nth-child(#{$i}) {
+			animation-delay: #{$i * 50}ms;
+		}
+	}
+	span {
+		animation: myBounce infinite 1s;
+	    transition-duration: 0.25s;
+	    transition-delay: 0s;
+	    transition-timing-function: ease-in;
+	}
+	&:hover span {
+	    animation: none;
+	    letter-spacing: 0;
+	    height: fit-content;
+	    width: fit-content;
+    	margin: 2rem -1rem 0 -1rem;
+	    padding: 0 0.4rem;
+	    @media (min-width: 1024px) {
+    		margin: 2rem -1.5rem 0 -1.5rem;
+	    	padding: 0 0.75rem;
+	    }
+	}
+}
+#archive_link {
+	&:hover {
+		border-radius: 1rem;
+	}
+}
+#welcome-page-bg {
+	span {
+	    width: 40px;
+	    height: 40px;
+	    border-radius: 50%;
+	    backface-visibility: hidden;
+	    position: absolute;
+	    animation-name: move;
+	    animation-duration: 6s;
+	    animation-timing-function: linear;
+	    animation-iteration-count: infinite;
+	    transition-delay: 1s;
+	    transition-duration: 1s;
+	}
+	@for $i from 1 through 20 {
+		span:nth-child(#{$i}) {
+  			$size: #{random(150)}px;
+			height: $size;
+			width: $size;
+			color: rgb(random(255), random(255), random(255));
+			animation-delay: #{$i * 50}ms;
+			left: percentage(random(90) / 100);
+			top: percentage(random(90) / 100);
+			animation-duration: #{random(100) * 0.06 + 10}s;
+			transform-origin: percentage((random(100) * 0.5 - 25)/100) percentage((random(100) * 0.5 - 25)/100);
+			box-shadow: #{(random(2)*2 - 3)*270}px 0 #{(random(100) * 0.01 + 0.5)*75}px currentColor;
+		}
+	}
+}
+@keyframes move {
+    100% {
+        transform: translate3d(0, 0, 1px) rotate(360deg);
+    }
+}
+@keyframes myBounce {
+	0%, 100% {
+		transform: translateY(0); 
+		animation-timing-function: cubic-bezier(0, 0, 1, 1);
+	}
+	50% {
+		transform: translateY(25%); 
+		animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+	}
+}
+#book-list-page .results-table {
+	tbody > tr {
+		&.even {
+			background-color: rgb(243, 244, 246);
+		}
+		&.odd {
+			background-color: rgb(229, 231, 235);
+		}
+		&:hover {
+			background-color: rgb(209, 213, 219);
+		}
+	}
+}

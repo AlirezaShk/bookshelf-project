@@ -17,11 +17,22 @@ class BookController extends Controller
      */
     public function index()
     {
-        $records = Book::cursorPaginate(15);
-        $ids = array_map(function ($a) {
-            return $a['id'];
-        }, $records->toArray()['data']);
-        return view('books.list', compact('records', 'ids'));
+
+        $records = Book::all();
+        $ids = [];
+        foreach($records as &$each) {
+            array_push($ids, $each->id);
+        }
+        $keys = [
+            'Name',
+            // 'Release Date',
+            'Author',
+            'Actions'
+        ];
+        $export_types = config('app.allowed_export_filetypes');
+        $id_list = 'id_list';
+        $navlinks = $this->generateNavLinks('/books');
+        return view('books.list', compact('records', 'ids', 'export_types', 'id_list', 'navlinks', 'keys'));
     }
 
     /**
@@ -111,9 +122,12 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy(Request $request, Book $book)
     {
         $book->delete();
+        if($request->input('responseType') == 'json') {
+            echo json_encode(["success"=>true]);
+        }
     }
 
     public function export(Request $request, string $type)

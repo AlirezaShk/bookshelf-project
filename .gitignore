@@ -1,9 +1,13 @@
 /node_modules
 /public/hot
 /public/storage
+/public/css
+/public/js
+/public/*
 /storage/*.key
 /vendor
 .env
+.env.dusk.*
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
