@@ -48,8 +48,12 @@
             confirm: function () {
                 let that = this;
         		$.post(this.modalUrl + this.target.id, {_method: 'DELETE', _token: this.csrfToken, responseType: 'json'}, function(data) {
-                    if(data.success)
+                    if(data.success){
                         $('.results-table tr[data-id='+ that.target.id +']').remove();
+                        let e = document.createEvent('HTMLEvents');
+                        e.initEvent('input', false, true);
+                        $("#search-form input[name=filter]")[0].dispatchEvent(e);
+                    }
                 }, 'json');
                 that.$emit('close');
         	},

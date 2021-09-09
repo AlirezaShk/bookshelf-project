@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class listActions extends Component
+class ListActions extends Component
 {
     public $type;
     public $record;
@@ -26,6 +26,6 @@ class listActions extends Component
      */
     public function render()
     {
-        return view('components.list-actions', ['type' => $this->type, 'record' => $this->record]);
+        return view('components.list-actions');
     }
 }

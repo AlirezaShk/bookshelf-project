@@ -30,8 +30,9 @@ class BookController extends Controller
         ];
         $export_types = config('app.allowed_export_filetypes');
         $id_list = 'id_list';
-        $navlinks = $this->generateNavLinks('/books');
-        return view('books.list', compact('records', 'ids', 'export_types', 'id_list', 'navlinks', 'keys'));
+        $preNavLinks = $this->generatePreNavLinks('/books');
+        $postNavLinks = $this->generatePostNavLinks('/books');
+        return view('books.list', compact('records', 'ids', 'export_types', 'id_list', 'preNavLinks', 'postNavLinks', 'keys'));
     }
 
     /**
@@ -125,23 +126,53 @@ class BookController extends Controller
     {
         $book->delete();
         if($request->input('responseType') == 'json') {
-            echo json_encode(["success"=>true]);
+            echo json_encode(['success' => TRUE]);
+        }
+    }
+
+    public function applyFilter(Request $request)
+    {
+        // if($request->session()->missing('books.filter')) {
+        //     $request->session()->put('books.filter', []);
+        // }
+        // $request->session()->push('books.filter', [
+        //     $request->input('filterType') => $request->input('filterData')
+        // ]);
+        if(session('books.filter') !== NULL) {
+            $a = session('books.filter');
+        } else {
+            $a = [];
+        }
+        array_push($a, [$request->input('filterType') => $request->input('filterData')]);
+        session(['books.filter' => $a]);
+        return json_encode(['success' => TRUE]);
+    }
+
+    public function deleteFilter(Request $request)
+    {
+        $a = session('books.filter');
+        unset($a[$request->input('key')]);
+        session(['books.filter' => $a]);
+        if($request->input('responseType') == 'json') {
+            echo json_encode(['success' => TRUE]);
         }
     }
 
     public function export(Request $request, string $type)
     {
-        // $conditions = array_map(function ($a) {
-        //     return $a['id'];
-        // }, $request->all());
-        $id_array = explode(', ', $request->input('ids'));
+        $fields = json_decode($request->input('fields'));
+        $id_array = json_decode($request->input('ids'));
         $books = Book::whereIn('id', $id_array)->get();
         $data = [];
         $i = 0;
         foreach($books as $book) {
-            $data[$i] = $book->getAttributes();
-            $data[$i]['author'] = $book->author;
-            unset($data[$i++]['author_id']);
+            foreach($fields as $field){
+                $data[$i][$field] = $book->$field;
+                if ($field === 'author') {
+                    $data[$i][$field] = $data[$i][$field]->getAttributes();
+                }
+            }
+            $i++;
         }
         $formatter = Formatter::make($data, Formatter::ARR);
 

@@ -4,17 +4,19 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class searchBar extends Component
+class SearchBar extends Component
 {
     public $exportTypes;
+    public $fields;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($exportTypes)
+    public function __construct($exportTypes, $fields)
     {
-        $this->exportTypes = $exportTypes;
+        $this->exportTypes = json_decode(htmlspecialchars_decode($exportTypes));
+        $this->fields = json_decode(htmlspecialchars_decode($fields));
     }
 
     /**
@@ -24,6 +26,6 @@ class searchBar extends Component
      */
     public function render()
     {
-        return view('components.search-bar', ['exportTypes' => $this->exportTypes]);
+        return view('components.search-bar');
     }
 }

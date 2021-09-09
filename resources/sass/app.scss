@@ -82,16 +82,30 @@
 		animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
 	}
 }
-#book-list-page .results-table {
-	tbody > tr {
-		&.even {
-			background-color: rgb(243, 244, 246);
+#book-list-page {
+	#currentFilters span.marked-for-delete {
+		box-shadow: var(--tw-ring-inset) 0 0 0 3px rgba(220, 38, 38, 0.8);
+	}
+	select[name='export-fields-selector'] {
+		> option.included {
+			background-color: #00EBFF80;
+			font-weight: bold;
 		}
-		&.odd {
-			background-color: rgb(229, 231, 235);
-		}
-		&:hover {
-			background-color: rgb(209, 213, 219);
+	}
+	.results-table {
+		tbody > tr {
+			&.even {
+				background-color: rgb(243, 244, 246);
+			}
+			&.odd {
+				background-color: rgb(229, 231, 235);
+			}
+			&:hover {
+				background-color: rgb(209, 213, 219);
+			}
+			&.filtered {
+				display: none;
+			}
 		}
 	}
 }

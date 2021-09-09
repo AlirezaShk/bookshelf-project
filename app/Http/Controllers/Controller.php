@@ -11,7 +11,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected function generateNavLinks(string $currentRoute)
+    protected function generatePreNavLinks(string $currentRoute)
     {
         $navlinks = [
             [
@@ -20,18 +20,40 @@ class Controller extends BaseController
             ]
         ];
         switch(get_class($this)) {
-            case 'BookController':
+            case 'App\Http\Controllers\BookController':
                 if(strpos($currentRoute, 'book/') !== FALSE)
                     array_push($navlinks, [
                         'url' => '/books',
-                        'title' => 'Home'
+                        'title' => 'Book Archive'
                     ]);
             break;
-            case 'AuthorController':
+            case 'App\Http\Controllers\AuthorController':
                 if(strpos($currentRoute, 'author/') !== FALSE)
                     array_push($navlinks, [
                         'url' => '/authors',
-                        'title' => 'Home'
+                        'title' => 'Author List'
+                    ]);
+            break;
+        }
+        return $navlinks;
+    }
+
+    protected function generatePostNavLinks(string $currentRoute)
+    {
+        $navlinks = [];
+        switch(get_class($this)) {
+            case 'App\Http\Controllers\BookController':
+                if(strpos($currentRoute, 'books') !== FALSE)
+                    array_push($navlinks, [
+                        'url' => '/book/new',
+                        'title' => 'Add New Book'
+                    ]);
+            break;
+            case 'App\Http\Controllers\AuthorController':
+                if(strpos($currentRoute, 'authors') !== FALSE)
+                    array_push($navlinks, [
+                        'url' => '/author/new',
+                        'title' => 'Add New Author'
                     ]);
             break;
         }
