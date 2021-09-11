@@ -13,7 +13,7 @@ class BookSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Book::factory(10)->create();
+        \App\Models\Book::factory(30)->create();
 
         $this->command->info('Books Table Seeded.');
     }

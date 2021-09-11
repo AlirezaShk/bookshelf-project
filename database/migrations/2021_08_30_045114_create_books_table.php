@@ -18,11 +18,11 @@ class CreateBooksTable extends Migration
             $table->string('name');
             $table->string('genre');
             $table->bigInteger('author_id', false, true);
-            $table->bigInteger('isbn', false, true);
+            $table->string('isbn');
             $table->date('release_date');
             $table->string('olang');
             $table->string('langs');
-            $table->tinyText('descrip')->nullable();
+            $table->text('descrip')->nullable();
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('authors')

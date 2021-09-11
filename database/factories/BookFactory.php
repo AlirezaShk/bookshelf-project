@@ -22,6 +22,7 @@ class BookFactory extends Factory
      */
     public function definition()
     {
+        $languageCodes = config('app.supporting_languages')['short'];
         return [
             'name' => $this->faker->name(),
             'genre' => $this->faker->word(),
@@ -30,8 +31,11 @@ class BookFactory extends Factory
                 return Author::factory()->create()->getAttribute('id');
             },
             'isbn' => Book::ISBNGenerator([10,13][$this->faker->numberBetween(0,1)]),
-            'olang' => $this->faker->languageCode(),
-            'langs' => json_encode([$this->faker->languageCode()]),
+            'olang' => $languageCodes[$this->faker->numberBetween(0, count($languageCodes) - 1)],
+            'langs' => [
+                $languageCodes[$this->faker->numberBetween(0, count($languageCodes) - 1)],
+                $languageCodes[$this->faker->numberBetween(0, count($languageCodes) - 1)],
+            ],
             'descrip' => $this->faker->optional(0.5, NULL)->paragraph(),
         ];
     }

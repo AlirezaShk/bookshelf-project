@@ -231,6 +231,17 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Eligible Export File Types
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify what type of files can be exported. 
+    | Preferably, only comment out instead of removal and advise
+    | soapbox/laravel-formatter (https://github.com/Soapbox/laravel-formatter).
+    |
+    */
+
     'allowed_export_filetypes' => [
         'CSV',
         'XML',
@@ -238,4 +249,49 @@ return [
         'JSON'
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Eligible Resource Languages
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify what languages used to create/edit resources. 
+    |
+    */
+
+    'supporting_languages' => [
+        'short' => [
+            'en',
+            'de',
+            'jp',
+            'sp',
+            'fr',
+            'ru',
+            'zh',
+            'it',
+            'xx',
+        ],
+        'long' => [
+            'English',
+            'Deutsch',
+            'Japanese',
+            'Spanish',
+            'French',
+            'Russian',
+            'Chinese',
+            'Italian',
+            'Other'
+        ],
+        'linked' => [
+            'en' => 'English',
+            'de' => 'Deutsch',
+            'jp' => 'Japanese',
+            'sp' => 'Spanish',
+            'fr' => 'French',
+            'ru' => 'Russian',
+            'zh' => 'Chinese',
+            'it' => 'Italian',
+            'xx' => 'Other'
+        ]
+    ],
 ];

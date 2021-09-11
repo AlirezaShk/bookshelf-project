@@ -20,7 +20,7 @@ class CreateAuthorsTable extends Migration
             $table->string('origin');
             $table->string('langs');
             $table->date('birth');
-            $table->date('death')->nullable();
+            $table->date('death')->nullable()->default(NULL);
             $table->timestamps();
         });
     }
