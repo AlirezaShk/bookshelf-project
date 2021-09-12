@@ -82,15 +82,9 @@
 		animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
 	}
 }
-#book-list-page {
+#book-list-page, #author-list-page {
 	#currentFilters span.marked-for-delete {
 		box-shadow: var(--tw-ring-inset) 0 0 0 3px rgba(220, 38, 38, 0.8);
-	}
-	select[name='export-fields-selector'] {
-		> option.included {
-			background-color: #00EBFF80;
-			font-weight: bold;
-		}
 	}
 	.results-table {
 		tbody > tr {
@@ -106,6 +100,177 @@
 			&.filtered {
 				display: none;
 			}
+		}
+	}
+	select[name='export-fields-selector'] {
+		> option.included {
+			background-color: #00EBFF80;
+			font-weight: bold;
+		}
+	}
+
+}
+#book-create-page {
+	#create-book {
+		padding: 0 25%;
+	}
+}
+#author-create-page {
+	#create-author {
+		padding: 0 25%;
+	}
+}
+.hover\:tw-color-link:hover {
+	color: #1d68a7;
+}
+input[disabled] {
+    background: #efefef;
+    color: #616161;
+}
+.au-books-table {
+	caption {
+		caption-side:top;
+		color: black;
+	}
+}
+#author-single-page form, #book-single-page form {
+	* {
+		transition-duration: 200ms;
+	}
+	&.preview {
+		.helper {
+		    color: transparent;
+		    display: none;
+		}
+		label {
+		    font-size: small;
+		    color: #777474;
+		}
+		input, textarea {
+		    padding: 0;
+		    padding-left: 1rem;
+		    border-color: transparent;
+		    background-color: transparent;
+		    &[disabled] {
+		    	color: black;
+		    }
+		    :not(.detailed) {
+			    resize: none;
+			    overflow: hidden;
+	    		height: 10rem;
+		    }
+		}
+		select {
+		    border-color: transparent;
+		    overflow: hidden;
+		    padding: 0;
+		    background-color: transparent;
+		    appearance: none;
+    		background-image: none;
+		    &:disabled {
+		    	option:not(:checked) {
+				    display: none;
+			    }
+			    option:checked {
+			    	color: black !important;
+			    }
+			}
+		}
+	}
+}
+.author-alive-wrapper.extra-extra label:after {
+    content: "Yes";
+    color: black;
+    position: relative;
+    clear: both;
+    float: left;
+    left: 1rem;
+    top: 24px;
+    margin-bottom: 20px;
+    width: 0;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.author-death-wrapper.extra-extra {
+	display: none !important;
+}
+.au-books-table, .results-table {
+	td:not(:last-child), th:not(:last-child), #zero-result td {
+    	padding: 1rem;
+	    white-space: nowrap;
+	    word-break: keep-all;
+	    overflow-x: auto;
+	}
+}
+.modal-mask {
+	z-index: 100;
+}
+nav {
+    grid-template-rows: auto !important;
+    background: linear-gradient(65deg, rgb(52, 211, 153), rgb(162, 255, 221));
+    border-bottom: 2px dashed #00000047;
+    z-index: 10;
+	> .tw-row-start-1 {
+	    border-right: 2px dashed;
+	    border: 2px dashed;
+	    border-color: #00000047;
+	    border-radius: 30%;
+	    background-color: #23f3a7;
+	    text-align: center;
+	}
+	.extra-link-wrapper {
+		margin-top: -100vh;
+		background-color: #eee;
+		padding-top: 10px;
+	    position: relative;
+    	z-index: -1;
+	    transition-delay: 200ms, 100ms, 400ms;
+    	transition-duration: 200ms, 100ms, 0ms;
+    	transition-property: margin-top, visibility, border-radius;
+	    visibility: hidden;
+	    border-radius: 30%;
+	    text-align: center;
+		&.shown {
+		    border-top-right-radius: 0;
+		    border-top-left-radius: 0;
+		    border-bottom-right-radius: 30px;
+		    border-bottom-left-radius: 30px;
+			margin-top: -15px;
+	    	transition-delay: 0ms, 50ms, 200ms;
+	    	z-index: -1;
+	    	visibility: visible;
+		}
+		> *:hover {
+	    	transition-duration: 200ms;
+			background-color: #ddd;
+			cursor: pointer;
+		}
+		> *:last-child {
+		    border-bottom-right-radius: 30px;
+		    border-bottom-left-radius: 30px;
+		}
+	}
+}
+.results-table {
+	th {
+		position: relative;
+		&.sort-by:after {
+		    content: " ";
+		    background-image: url("/icon/arrow.svg");
+		    background-position: center;
+		    background-repeat: no-repeat;
+		    background-size: cover;
+		    position: absolute;
+		    width: 24px;
+		    height: 20px;
+		    right: 0.5rem;
+		    top: 0;
+		    bottom: 0;
+		    margin: auto;
+		}
+		&.sort-by.sort-reversed:after {
+			transform: rotateX(180deg);
 		}
 	}
 }

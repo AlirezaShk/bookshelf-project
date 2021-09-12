@@ -5,31 +5,33 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\Models\Book;
+use App\Models\Author;
 
-class ExportBooksTest extends TestCase
+class ExportAuthorsTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
     /**
-     * Books List Exportion Test
+     * Authors List Exportion Test
      *
      * @return void
      */
 
     public function test_multiType_exports()
     {
-        $bookModel = new Book;
-        $bookTable = $bookModel->getTable();
+        $authorModel = new Author;
+        $authorTable = $authorModel->getTable();
 
-        $book_attribs = Book::factory(10)->create();
+        $author_attribs = Author::factory(10)->create();
 
         $id_array = [];
-        foreach($book_attribs as $attr) {
+        foreach($author_attribs as $attr) {
             $id_array[] = $attr['id'];
         }
-        $fields_attrs = $book_attribs[0]->getAttributes();
-        unset($fields_attrs['author_id']);
-        $fields_attrs['author'] = NULL;
+        $fields_attrs = $author_attribs[0]->getAttributes();
+        $fields_attrs['books'] = NULL;
+        $fields_attrs['name'] = NULL;
+        unset($fields_attrs['fname']);
+        unset($fields_attrs['lname']);
         $fields = array_keys($fields_attrs);
         $data = [
             'ids' => $id_array,
@@ -38,20 +40,20 @@ class ExportBooksTest extends TestCase
         $types = config('app.allowed_export_filetypes');
         
         //Check an invalid export type
-        $this->post(route('book.export', 'undefined'), $data)
+        $this->post(route('author.export', 'undefined'), $data)
             ->assertSessionHasErrors('export_type');
 
         //Check an empty id array
-        $this->post(route('book.export', 'csv'), ['fields'=>$fields])
+        $this->post(route('author.export', 'csv'), ['fields'=>$fields])
             ->assertSessionHasErrors('ids');
 
         //Check an empty fields array
-        $this->post(route('book.export', 'csv'), ['ids'=>$id_array])
+        $this->post(route('author.export', 'csv'), ['ids'=>$id_array])
             ->assertSessionHasErrors('fields');
 
         $this->withoutExceptionHandling();
         foreach($types as $type) {
-            $res = $this->post(route('book.export', $type), $data)
+            $res = $this->post(route('author.export', $type), $data)
                 ->assertDownload();
         }
     }

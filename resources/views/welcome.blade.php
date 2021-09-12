@@ -30,6 +30,6 @@
 	hover:tw-rounded
 	tw-duration-200 
 	tw-p-4 
-	' href="{{ url('/books') }}">Explore The Archive</a>
+	' href="{{ url('/book/list') }}">Explore The Archive</a>
 </div>
 @endsection

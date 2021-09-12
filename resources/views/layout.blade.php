@@ -19,7 +19,8 @@
 <body class='tw-fixed tw-inset-0 tw-h-auto tw-min-h-screen  tw-w-screen'>
 	<div id='app' class='tw-fixed tw-inset-0 tw-h-auto tw-min-h-screen tw-w-screen tw-overflow-auto'>
 		@yield('content')
+		<loader v-if='isLoading'></loader>
 	</div>
-	<script src="js/app.js"></script>
+	<script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

@@ -23,14 +23,32 @@ window.Vue = require('vue').default;
 const ArchiveExporter = require('./components/ArchiveExporter.vue').default;
 const ArchiveCrawler = require('./components/ArchiveCrawler.vue').default;
 const Modal = require('./components/Modal.vue').default;
+const FormHandler = require('./components/FormHandler.vue').default;
+const SingleEntry = require('./components/SingleEntry.vue').default;
+const Loader = require('./components/Loader.vue').default;
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+$.fn.extend({
+    toggleText: function(a, b){
+        return this.text(this.text() == b ? a : b);
+    }
+});
 
 const app = new Vue({
     el: '#app',
+    props: {
+        isLoading: {
+            type: Boolean,
+            default: true
+        },
+        resultsTableIsLoading: {
+            type: Boolean,
+            default: true
+        }
+    },
     data: {
         targetID: NaN,
         target: null,
@@ -39,47 +57,53 @@ const app = new Vue({
         showEditModal: false,
         modalDetail: null,
         showBack: false,
-        showNext: true
+        showNext: true,
+        archivePage: 0,
+        totalPages: 0,
     },
     components: {
         ArchiveExporter,
         ArchiveCrawler,
-        Modal
+        Modal,
+        FormHandler,
+        SingleEntry,
+        Loader
     },
     mounted() {
-        this.$watch(
-          () => {
-            return this.$refs.ArchiveCrawler.resultPages
-            },
-          (val) => {
-            if(val == undefined) return;
-            this.paginateResults({
-                total: val.total.slice(0),
-                valid: val.valid.slice(0),
-            });
-          });
+        $('.results-table thead th:eq(0)').click();
+        this.$set(this, 'isLoading', false);
     },
     methods: {
+        /**
+        * Turn the pages of the table rows of the results table.
+        * 
+        * @param Number page
+        * An integer in [-1, 0, +1]. 
+        * +1/-1 turn page of the results table to the next/previous one
+        * 0 go  to the first page
+        **/
+
         turnPage: function (page) {
             let table = $('.results-table')[0];
             switch(page) {
                 case 0:
                     break;
                 default:
-                    page = parseInt($(table).attr('page')) + page;
+                    this.$set(this, 'resultsTableIsLoading', true);
+                    page = this.archivePage + page;
                     break;
             }
-            $(table).attr('page', page);
-            $(table).find('tbody > tr').addClass('tw-hidden');
+            this.archivePage = page;
+            $(table).find('tbody > tr:not(#table-loader)').addClass('tw-hidden');
             $(table).find('tbody > tr[page='+page+']').removeClass('tw-hidden');
             $(table).find('tbody > tr#zero-result').addClass('tw-hidden');
-            if ($(table).attr('total') == 1) {
+            if (this.totalPages == 1) {
                 this.showBack = false;
                 this.showNext = false;
-                if ($(table).find('tbody > tr.tw-hidden').length == $(table).find('tbody > tr').length) {
+                if ($(table).find('tbody > tr.tw-hidden').length == $(table).find('tbody > tr:not(#table-loader)').length) {
                     $(table).find('tbody > tr#zero-result').removeClass('tw-hidden');
                 }
-            } else if ($(table).attr('total') == page+1) {
+            } else if (this.totalPages == page+1) {
                 this.showBack = true;
                 this.showNext = false;
             } else if (page == 0) {
@@ -89,10 +113,26 @@ const app = new Vue({
                 this.showBack = true;
                 this.showNext = true;
             }
+            this.$set(this, 'resultsTableIsLoading', false);
         },
+
+        /**
+        * Apply the pagination of the results on the results table and
+        * its rows/
+        * 
+        * @param Object page
+        * Has two keys: 
+        *   1- valid: 
+        *       Paginated valid table rows
+        *   2- total:
+        *       All table rows
+        * 
+        * @function app.turnPage()
+        **/
+
         paginateResults: function (pages) {
             let table = $('.results-table')[0];
-            $(table).find('tbody > tr:not(#zero-result)').remove();
+            $(table).find('tbody > tr:not(#zero-result):not(#table-loader)').remove();
             let j = 0, k = 0;
             for(let i = 0; i < pages.total.length; i++) {
                 $(pages.total[i]).removeClass('odd').removeClass('even');
@@ -113,12 +153,111 @@ const app = new Vue({
                 $(table).find('tbody').append(pages.total[i]);
             }
             if (pages.valid == undefined)
-                $(table).attr('total', 1);
+                this.totalPages = 1;
             else
-                $(table).attr('total', pages.valid.length);
+                this.totalPages = pages.valid.length;
             this.showBack = false;
             this.showNext = true;
             this.turnPage(0);
         },
+
+        /**
+        * Apply a hard filter (store in session) via api.{type}.filter.
+        * 
+        * @param String type
+        * Name (key) of the filtered attribute
+        * 
+        * @param String keyword
+        * Value of the filtered attribute
+        *
+        * @param String archive
+        * Type of the resource
+        **/
+
+        applyFilter: function(type, keyword, archive){
+            let data = {
+                filterType : type,
+                filterData : keyword,
+            };
+            let url = "/api/" + archive + "/filter";
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: data,
+                dataType: 'json',
+                success: function (data) {
+                    if(data.success) {
+                        window.location = '/' + archive + '/list';
+                    }
+                }
+            });
+        },
+
+        /**
+        * Display navigation bar extra links
+        **/
+
+        showExtra: function (e) {
+            let nav = $('nav.page-navbar')[0];
+            let target = e.target;
+            if (!$(target).hasClass('extra-link-wrapper')) {
+                let index = $(nav).find(".nav-item").index(e.target);
+                let extraLinks = $(nav).find('.extra-link-wrapper.tw-col-start-'+(index+1));
+                if (extraLinks) {
+                    $(nav).attr('showing-extra', index);
+                    extraLinks.addClass('shown');
+                }
+            } else {
+                let extraLinks = $(target);
+                if (!extraLinks.hasClass('shown')) {
+                    extraLinks.addClass('shown');
+                }
+                extraLinks.addClass('locked');
+            }
+        },
+
+        /**
+        * Hide navigation bar extra links
+        **/
+
+        hideExtra: function (e) {
+            let nav = $('nav.page-navbar')[0];
+            let target = e.target;
+            if (!$(target).hasClass('extra-link-wrapper')) {
+                let index = $(nav).find(".nav-item").index(e.target);
+                let prevIndex = parseInt($('nav').attr('showing-extra'));
+                if (index === prevIndex) {
+                    let extraLinks = $(nav).find('.extra-link-wrapper.tw-col-start-'+(index+1));
+                    if(!extraLinks.hasClass('locked'))
+                        extraLinks.removeClass('shown');
+                }
+            } else {
+                let extraLinks = $(target);
+                extraLinks.removeClass('shown').removeClass('locked');
+            }
+        },
+
+        /**
+        * Callback to set the app.resultsTableIsLoading state to true.
+        * This will display the results-table Loader.
+        **/
+        
+        resultsTableLoading: function () {
+            this.$set(this, 'resultsTableIsLoading', true);
+        },
+
+        /**
+        * After searching and fliteration process is done, (sorted)
+        * data is transfered here to undergo pagination.
+        * 
+        * @function app.pageinateResults
+        **/
+
+        searchCallBack: function (e) {
+            this.paginateResults({
+                total: e.total.slice(0),
+                valid: e.valid.slice(0),
+            });
+        }
     }
 });

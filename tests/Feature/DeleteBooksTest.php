@@ -3,15 +3,14 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Book;
 
 class DeleteBooksTest extends TestCase
 {
-    use WithFaker, RefreshDatabase;
+    use RefreshDatabase;
     /**
-     * A basic feature test example.
+     * Book Deletion Test
      *
      * @return void
      */
@@ -22,14 +21,15 @@ class DeleteBooksTest extends TestCase
         $bookModel = new Book;
         $bookTable = $bookModel->getTable();
 
-        $book = Book::factory()->create();
+        while($this->testCnt--) 
+        {
+            $book = Book::factory()->create();
 
-        $attributes = $book->getAttributes();
+            $res = $this->delete(route('book.delete', $book->id))
+                ->assertOk();
 
-        $this->post('/book/'.$book->id, ['_method' => 'DELETE'])
-            ->assertOk();
-
-        //Double checking to be sure
-        $this->assertDatabaseMissing($bookTable, $attributes);
+            //Double checking to be sure
+            $this->assertDatabaseMissing($bookTable, $book->getAttributes());
+        }
     }
 }

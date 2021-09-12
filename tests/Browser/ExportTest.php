@@ -19,7 +19,7 @@ class ExportTest extends DuskTestCase
     {
         Book::factory(10)->create();
         $this->browse(function (Browser $browser) {
-            $browser->visit('/books')
+            $browser->visit(route('book.list'))
                     ->assertSee('Select an output file type')
                     ->select('#exportTypeSelector')
                     ->press('export_submit')

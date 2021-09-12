@@ -1,15 +1,23 @@
 <template>
     <div id='currentFilters' class='tw-w-full tw-col-span-6 tw-h-max tw-float-left'>
-        <span v-for='(obj, key) in filters' class='tw-p-2 tw-relative tw-float-left tw-rounded tw-bg-gray-200 hover:tw-bg-red-200 tw-duration-100 tw-cursor-pointer tw-mt-2 tw-mr-2' :data-key='key' @click='mark'>
-	        {{ preFormatFilters(obj) }}
+        <span v-for='(filter, key) in filters' class='tw-p-2 tw-relative tw-float-left tw-rounded tw-bg-gray-200 hover:tw-bg-red-200 tw-duration-100 tw-cursor-pointer tw-mt-2 tw-mr-2' :data-key='key' @click='mark' :data-code='filter.code'>
+	        {{ filter.label + ": " + filter.value }}
 	    </span>
     </div>
 </template>
 <script>
 	export default {
+	    /**
+	    * Archive Crawler Current Filters
+	    * 
+	    * This Vue component is in charge of hard filters (submitted
+	    * filters through api, read from session).
+	    * 
+	    **/
 		props: [
 			'apply',
-			'filters'
+			'filters',
+			'type'
 		],
 		data : function () {
 			return {
@@ -18,6 +26,11 @@
 			}
 		},
 		methods: {
+		    /**
+		    * Mark a hard filter. If it is already marked, send request to 
+		    * api.{type}.delete-filter to delete a filter.
+		    **/
+		    
 			mark: function(e) {
 				let filter = e.target;
 				if (!$(filter).hasClass('marked-for-delete')) {
@@ -26,78 +39,38 @@
 						$(filter).removeClass('marked-for-delete');
 					}, 2000);
 				} else {
-					$.post('books/filter', {
-						_method: 'DELETE',
-						responseType: 'json',
-						key: $(filter).data('key'),
-					}, function (data) {
-						if (data.success) {
-							location.reload();
-						}
-					}, 'json');
+					let url =  "/api/" + this.type + "/filter";
+		            $.ajax({
+		                url: url,
+		                type: 'DELETE',
+		                data: {
+							key: $(filter).data('key'),
+						},
+		                dataType: 'json',
+		                success: function (data) {
+		                    if(data.success) {
+								location.reload();
+		                    }
+		                }
+		            });
 				}
 			},
-			preFormatFilters: function(filter) {
-        		if ('f' in filter) {
-					return "f: " + filter.f;
-        		} else if ('g' in filter) {
-					return "g: " + filter.g;
-        		} else if ('au' in filter) {
-					return "au: " + filter.au;
-        		} else if ('t' in filter) {
-					return "t: " + filter.t;
-        		} else if ('cd' in filter) {
-					return "cd: " + filter.cd;
-        		} else if ('rd' in filter) {
-					return "rd: " + filter.rd;
-        		} else if ('ud' in filter) {
-					return "ud: " + filter.ud;
-        		}
-			},
-            formatFilters: function(filter) {
-                let parts = filter.textContent.split(':');
-                $(filter).attr('data-type', parts[0].trim());
-                switch(parts[0].trim()) {
-                    case 'f':
-                        parts[0] = 'Freeword';
-                        break;
-                    case 't':
-                        parts[0] = 'Title';
-                        break;
-                    case 'g':
-                        parts[0] = 'Genre';
-                        break;
-                    case 'au':
-                        parts[0] = 'Author\'s Name';
-                        break;
-                    case 'rd':
-                        parts[0] = 'Release Date';
-                        break;
-                    case 'ud':
-                        parts[0] = 'Last Update Date';
-                        break;
-                    case 'cd':
-                        parts[0] = 'Create Date';
-                        break;
-                }
-                $(filter).text(parts.join(':'));
-            },
+
+            /**
+		    * Apply the Hard Filter
+		    **/
+
             hardFilterIt: function () {
                 let filters = $("#currentFilters");
                 let each = $("#currentFilters span");
                 let table = $(".results-table")[0];
-                let rows = $(table).find("tbody > tr:not(#zero-result)");
+                let rows = $(table).find("tbody > tr:not(#zero-result):not(#table-loader)");
                 $(rows).removeClass('filtered');
                 for (let i = 0; i < each.length; i++) {
                     let parts = each[i].textContent.split(':');
-                    let filterType;
-                    if ($(each[i]).data('type') != undefined)
-                    	filterType = $(each[i]).data('type');
-                	else
-                    	filterType = parts[0];
                     for(let j = 0; j < rows.length; j++) {
                         //case insensitive search for the input value inside each row of the results table
-                        if (this.apply(rows[j], parts[1].trim(), filterType) == -1) {
+                        if (this.apply(rows[j], parts[1].trim(), $(each[i]).data('code')) == -1) {
                             $(rows[j]).addClass('filtered');
                         }
                     }

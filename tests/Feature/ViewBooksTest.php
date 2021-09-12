@@ -12,7 +12,7 @@ class ViewBooksTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
     /**
-     * A basic feature test example.
+     * Books List View Test
      *
      * @return void
      */
@@ -20,16 +20,23 @@ class ViewBooksTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $all = Book::factory(10)->create();
-        $response = $this->get('/books');
+        $response = $this->get(route('book.list'));
         foreach($all as $record)
-            $response->assertSee($record->name);
+            $response->assertSee($record->id);
     }
 
+    /**
+     * Single Book Entry View Test
+     *
+     * @return void
+     */
     public function test_single_view()
     {
         $this->withoutExceptionHandling();
-        $record = Book::factory()->create();
-        $response = $this->get('/book/' . $record->id)
-            ->assertSee($record->name);
+        while($this->testCnt--) {
+            $record = Book::factory()->create();
+            $response = $this->get(route('book.entry/edit-view', $record->id))
+                ->assertSee($record->id);
+        }
     }
 }

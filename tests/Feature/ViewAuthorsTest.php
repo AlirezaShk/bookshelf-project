@@ -11,7 +11,7 @@ class ViewAuthorsTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
     /**
-     * A basic feature test example.
+     * Authors List View Test
      *
      * @return void
      */
@@ -19,16 +19,23 @@ class ViewAuthorsTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $all = Author::factory(10)->create();
-        $response = $this->get('/authors');
+        $response = $this->get(route('author.list'));
         foreach($all as $record)
-            $response->assertSee($record->fname . " " . $record->lname);
+            $response->assertSee($record->id);
     }
 
+    /**
+     * Single Author Entry View Test
+     *
+     * @return void
+     */
     public function test_single_view()
     {
         $this->withoutExceptionHandling();
-        $record = Author::factory()->create();
-        $response = $this->get('/author/' . $record->id)
-            ->assertSee($record->fname . " " . $record->lname);
+        while($this->testCnt--) {
+            $record = Author::factory()->create();
+            $response = $this->get(route('author.entry/edit-view', $record->id))
+                ->assertSee($record->id);
+        }
     }
 }

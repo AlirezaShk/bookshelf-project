@@ -10,13 +10,7 @@
 
           <div class="modal-body tw-border-b" v-if="detailMode">
           	<div class='tw-grid tw-rows-auto tw-grid-cols-2'>
-                <h2 class='tw-col-span-2 tw-font-bold tw-text-lg'>{{ target.name }}</h2>
-                <div class='tw-col-span-1'>By 
-                    <a :href='"/author/"+target.author.id'>{{ target.author.fname + " " + target.author.lname }}</a>
-                </div>
-                <div class='tw-col-span-1'>Released {{ target.release_date }}</div>
-                <div class='tw-col-span-2'>In: <a :href='"/books?genre="+target.genre'>{{ target.genre }}</a></div>
-                <div class='tw-col-span-2 tw-line-clamp-2'>{{ target.descrip }}</div>
+                <slot></slot>
             </div>
           </div>
           <div class="modal-body tw-border-b" v-else>
@@ -39,29 +33,77 @@
 </template>
 <script>
     export default {
-    	props: ['modalUrl', 'header', 'body', 'target', 'csrfToken', 'detailMode'],
+        /**
+        * Modal
+        * 
+        * This Vue component is used for modals (pop up message window)
+        * for a record detail (fields are provided by a <slot> tag) or 
+        * a delete message, using Modal.body to form the body of the 
+        * message.
+        **/
+    	props: ['modalUrl', 'header', 'body', 'target', 'csrfToken', 'detailMode', 'applyFilter', 'type'],
         data: function () {
             this.body = "Are you sure you want to delete this book from the archive?";
-            return {}
+            return {
+                target: this.target,
+                type: this.type
+            }
         },
         methods: {
+            /**
+            * After confirming deletion, sends a DELETE request to api.{type}.delete
+            **/
+
             confirm: function () {
                 let that = this;
-        		$.post(this.modalUrl + this.target.id, {_method: 'DELETE', _token: this.csrfToken, responseType: 'json'}, function(data) {
-                    if(data.success){
-                        $('.results-table tr[data-id='+ that.target.id +']').remove();
-                        let e = document.createEvent('HTMLEvents');
-                        e.initEvent('input', false, true);
-                        $("#search-form input[name=filter]")[0].dispatchEvent(e);
+                $.ajax({
+                    url: this.modalUrl.replace(this.type, 'api/'+this.type) + this.target.id,
+                    type: 'DELETE',
+                    data: {
+                        _method: 'DELETE', 
+                        _token: this.csrfToken,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.success){
+                            $('.results-table tr[data-id='+ that.target.id +']').remove();
+                            let e = document.createEvent('HTMLEvents');
+                            e.initEvent('input', false, true);
+                            $("#search-form input[name=filter]")[0].dispatchEvent(e);
+                        }
                     }
-                }, 'json');
+                });
                 that.$emit('close');
         	},
+
+            /**
+            * Open {type}.entry/edit-view page for the record.
+            **/
+            
             expandDetails: function () {
-                window.location = '/book/' + this.target.id;
+                window.location = this.modalUrl + this.target.id;
+            },
+
+            /**
+            * Apply a hard filter (stored in session) for the genre of 
+            * this Book.
+            **/
+
+            genreSearch: function (genre) {
+                event.preventDefault();
+                this.applyFilter(
+                    'g', 
+                    genre,
+                    'books'
+                );
             }
         },
         watch : {
+
+            /**
+            * Change header of the Modal box based on Modal.detailMode
+            **/
+            
             detailMode: {
                 immediate: true,
                 handler(val) {
@@ -69,6 +111,7 @@
                         this.header = "Record Details";
                     } else {
                         this.header = "Delete Record";
+                        this.body = "Are you sure you want to delete this "+ this.type +" from the archive?";
                     }
                 }
             }

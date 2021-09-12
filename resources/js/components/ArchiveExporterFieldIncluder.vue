@@ -1,11 +1,17 @@
 <template>
     <select class='tw-col-span-1' name='export-fields-selector' @change='toggleField'>
         <option value='' selected>Included Fields</option>
-        <option v-for='field in fields' :value="formatExportFieldValue(field)">{{ formatExportFieldName(field) }}</option>
+        <option v-for='field in fields' :value="field.raw">{{ field.label }}</option>
     </select>
 </template>
 <script>
 	export default {
+        /**
+        * Archive Exporter Field Includer
+        * 
+        * This Vue component is in charge of selection of the 
+        * attributes.
+        **/
 		props: ['fields'],
 		data: function (){
 			return {
@@ -13,31 +19,9 @@
 			}
 		},
 		methods: {
-			formatExportFieldName: function (field) {
-		        switch(field) {
-		            case 'name':
-		                field = 'title';
-		                break;
-		            case 'descrip':
-		                field = 'description';
-		                break;
-		            case 'author_id':
-		                field = 'author';
-		                break;
-		        }
-		        return field.split('_').map(this.ucwords).join(' ');
-			},
-			formatExportFieldValue: function (field) {
-		        switch(field) {
-		            case 'author_id':
-		                field = 'author';
-		                break;
-		        }
-		        return field;
-			},
-			ucwords: function (str) {
-  				return str.charAt(0).toUpperCase() + str.slice(1);
-			},
+	        /**
+	        * Toggles the selection state of an attribute 
+	        **/
 			toggleField: function (e) {
 				let field = e.target.value;
 				if (field === '') return;
