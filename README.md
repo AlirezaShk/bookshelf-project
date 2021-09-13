@@ -1,64 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Bookshelf
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project is a Book and Author Archive.  
+Desired Books and Authors can be stored, edited, deleted and exported.  
+The resource lists can also be searched and sorted.  
 
-## About Laravel
+## Table of Contents
+- [Dependencies](#dependencies)  
+- [How to Initialize](#how-to-initialize)  
+- [Tests](#tests)  
+- [Issues](#issues)  
+- [Development Ideas](#development-ideas)  
+- [Final Word](#final-word)  
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Dependencies
+Backend foundation is based on  
+>  1. [php (8.0)](https://www.php.net/releases/8.0/en.php)  
+>  2. [laravel (8.54)](https://laravel.com/docs/8.x/releases) 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+For testing, following package is used  
+> 1. [phpunit/phpunit (9.33)](https://github.com/sebastianbergmann/phpunit)  
+>  For Unit and Features Tests
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+For Frontend compilation
+> 1. [laravel-mix/laravel-mix (6.0.6)](https://github.com/laravel-mix/laravel-mix)  
+> 2. [tailwindcss (2.2.9)](https://tailwindcss.com/)  
+> 3. [bootstrap (4.6.0)](https://getbootstrap.com/docs/4.6/getting-started/introduction/)  
+> 4. [JQuery (3.6)](https://jquery.com/)  
+> 5. [PostCSS (8.3.6)](https://github.com/postcss/postcss/releases)  
 
-## Learning Laravel
+Complete list of dependencies are provided via `composer.json` and `package.json`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## How to Initialize
+1. After pulling the project, edit your `.env` and `docker-compose.yml` to setup the database connection and environment variables.  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Start the docker containers.
+> docker-compose up -d
 
-## Laravel Sponsors
+3. Run the migrations and seed the tables
+> php artisan migrate  
+> php artisan db:seed  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+If you encounter an error such as below, visit this: [Issue 1](#issue-1)  
 
-### Premium Partners
+> SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed  
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
+## Tests  
 
-## Contributing
+Run the tests using
+> php artisan test  
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+If you are using `sqlite` & `:memory:`, you might face a problem regarding migrations: [Issue 2](#issue-2) 
 
-## Code of Conduct
+---
+### Unit Tests  
+Tests the integrity of basic functionality and properties of both `Book` and `Author` mdels. 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
+### Feature Tests  
 
-## Security Vulnerabilities
+Testing different routes and different functionality of `Controllers`.  
+Includes tests for __Creating__, __Deleting__, __Updating__, __Getting__ and __Exporting__ a resource from and into the Database.  
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
+### Browser Tests  
 
-## License
+Currently covers one of the form submissions of the website.  
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+## Issues  
+
+---
+### Issue 1  
+
+**CAUSE:**  This might happen due to the inconsistency of connections between different containers of the docker.  
+
+**SOLUTION:** Change your `.env` before migration to the host specified in `docker-compose.yml`; for e.g. if the following is:  
+>  # docker-compose.yml  
+>  ...  
+> services:  
+>    ports:  
+>      - 127.0.0.1:8000:8000  
+
+Then, `.env` should be changed to  
+>  # .env   
+>  ...  
+>  DB_HOST=127.0.0.1
+
+Then the migration can be run safely. After seeding is finished, revert `DB_HOST` to the name of the docker container of the database.
+
+---
+### Issue 2  
+
+**CAUSE:**  This is a follow up to the last issue.  
+
+**SOLUTION:** Change your `DB_HOST` in `.env` to `sqlite` and run the migrations; revert back to the old value after the migrations are done.  
+
+---
+### Issue 3  
+##### Laravel/Dusk  
+Not much Browser Tests were to be done since laravel/dusk stopped working.  
+
+**CAUSE:** A version mismatch with my linux's chrome driver. Tried other drivers as well but was unsuccessful. 
+
+**SOLUTION:** UNRESOLVED 
+
+---
+### Issue 4  
+##### HTML special chars  
+Some of the text values stored for the resources in the DB, were stored in HTML special chars escaped format. For example, "O'Riley" was stored, retrieved, and shown as "O& #39;Riley"  
+
+**CAUSE:**  UNKNOWN  
+
+**SOLUTION:** UNRESOLVED  
+
+---
+## Development Ideas  
+Many ideas to further develop the project in the future exist, such as:
+
+- #### More Tests  
+Especially, Browser Tests.  
+- #### SPA (Single Page Application)  
+This whole project can be turned into a SPA which will drastically increase the project's speed, smoothness and performance. 
+
+- #### Authentication  
+Login page and mandatory authentication can be implemented to ensure the safety of the archive.  
+Currently, the project is aimed towards a controlled environment (e.g. on a local server) book archive rather than a website.  
+
+- #### Enforce CSRF Token Verification for API  
+- #### More Custom Made Requests and Validations  
+For some routes, the application implements custom made requests; this can be applied to all the requests for all routes to check the incoming request paramteres and validate the datas in more places.
+- #### More Middleware for Security  
+Middlewares to restrict headers and enfore authentication (as mentioned) can also be a good addition.  
+- #### Use SCSS Instead of TailWindCSS  
+Since the project was aimed towards a fast GUI development and more focused on the Backend, TailwindCSS was implemented and this can be replaced by using SASS and custom classes. 
+---
+## Final Word  
+The unresolved issues could be traced and resolved by spending more time on the debugging, unfortunately I didn't trace them myself, yet.  
+I hope this project meets your criteria!  
+Also, regardless of the answer to be positive or negative (about whether I've passed or not), I want to hear Your thoughts on my coding and I would love to get some feedback on how to I improve myself, so, please be kind and send some of Your wisdom towards me!  
+Can't wait to hear from You.
