@@ -132,7 +132,8 @@ For some routes, the application implements custom made requests; this can be ap
 - #### More Middleware for Security  
 Middlewares to restrict headers and enfore authentication (as mentioned) can also be a good addition.  
 - #### Use SCSS Instead of TailWindCSS  
-Since the project was aimed towards a fast GUI development and more focused on the Backend, TailwindCSS was implemented and this can be replaced by using SASS and custom classes. 
+Since the project was aimed towards a fast GUI development and more focused on the Backend, TailwindCSS was implemented and this can be replaced by using SASS and custom classes.   
+
 ---
 ## Final Word  
 The unresolved issues could be traced and resolved by spending more time on the debugging, unfortunately I didn't trace them myself, yet.  
